@@ -8,9 +8,8 @@ namespace GithubActivity.EventHandler;
 
 public class PushEvent : IEventParser
 {
-    protected static PreviousEventData prevData;
     private static int amount = 1;
-    public void ParseEvent(JsonNode jsonNode, List<string> result)
+    public void ParseEvent(JsonNode jsonNode, PreviousEventData prevData, List<string> result)
     {
         string? repositoryName = jsonNode["repo"]?["name"]?.ToString();
 
@@ -27,8 +26,5 @@ public class PushEvent : IEventParser
             amount = 1;
             result.Add($"- Pushed a commit to {repositoryName}");
         }
-
-        prevData.previousEventType = jsonNode["type"]!.ToString();
-        prevData.previousRepository = repositoryName;
     }
 }

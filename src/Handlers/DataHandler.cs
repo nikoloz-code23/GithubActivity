@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using GithubActivity.EventHandler;
 using GithubActivity.Interfaces;
+using GithubActivity.Structs;
 
 namespace GithubActivity.Handlers;
 
@@ -19,6 +20,7 @@ public class DataHandler
 
     public void ParseData(JsonNode jsonData)
     {
+        PreviousEventData prevData = new();
         JsonArray jsonArray = jsonData.AsArray();
 
         foreach(var element in jsonArray)
@@ -34,7 +36,10 @@ public class DataHandler
             {
                 if (eventParser == null) continue;
 
-                eventParser.ParseEvent(element, parsedEvents);
+                eventParser.ParseEvent(element, prevData, parsedEvents);
+
+                prevData.previousEventType = eventTypeValue;
+                prevData.previousRepository = element["repo"]?["name"]?.ToString();
             }
         }
     }
