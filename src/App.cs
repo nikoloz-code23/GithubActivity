@@ -11,7 +11,7 @@ public class App
 {
     // Easy way to make sure it's a singleton.
     // Only one App at a time anyway, am i rite?
-    public static HttpClient client = new();
+    static readonly HttpClient client = new();
     public string GithubUsername { get; set; } = "kamranahmedse";
     public string GithubURL { get; set; }
     
@@ -34,6 +34,8 @@ public class App
             return;
         }
 
-        handler.FilterData(jsonData);
+        handler.ParseData(jsonData);
+
+        handler.PrintParsedData();
     }
 }
