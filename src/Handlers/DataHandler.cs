@@ -1,11 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Nodes;
+using GithubActivity.EventHandler;
+using GithubActivity.Interfaces;
 
 namespace GithubActivity.Handlers;
 
 public class DataHandler
 {
-    public void FilterData(JsonNode jsonData)
+    public List<string> parsedEvents = new();
+    private Dictionary<string, IEventParser> EventHandlers = new();
+
+    public DataHandler()
+    {
+        EventHandlers.Add("PushEvent", new PushEvent());
+    }
+
+    public void ParseData(JsonNode jsonData)
     {
         JsonArray jsonArray = jsonData.AsArray();
 
@@ -18,13 +29,19 @@ public class DataHandler
 
             string eventTypeValue = eventType.ToString();
 
-            if (eventTypeValue != "PushEvent") continue;
-
-            // TODO: Separate class that will handle the events and the data with them.
-            // Console.WriteLine(element["repo"]["name"]);
-            Console.WriteLine(element);
-            Console.WriteLine("---");
+            if (EventHandlers.TryGetValue(eventTypeValue, out IEventParser? value))
+            {
+                if (value == null) continue;
+                value.ParseEvent(element, parsedEvents);
+            }
         }
-        // TODO: Depending on the type, save important data in a Class and have a ToString function.
+    }
+
+    public void PrintParsedData()
+    {
+        foreach(string data in parsedEvents)
+        {
+            Console.WriteLine(data);
+        }
     }
 }
