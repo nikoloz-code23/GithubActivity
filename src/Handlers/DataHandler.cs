@@ -14,6 +14,7 @@ public class DataHandler
     public DataHandler()
     {
         EventHandlers.Add("PushEvent", new PushEvent());
+        EventHandlers.Add("WatchEvent", new WatchEvent());
     }
 
     public void ParseData(JsonNode jsonData)
@@ -29,10 +30,11 @@ public class DataHandler
 
             string eventTypeValue = eventType.ToString();
 
-            if (EventHandlers.TryGetValue(eventTypeValue, out IEventParser? value))
+            if (EventHandlers.TryGetValue(eventTypeValue, out IEventParser? eventParser))
             {
-                if (value == null) continue;
-                value.ParseEvent(element, parsedEvents);
+                if (eventParser == null) continue;
+
+                eventParser.ParseEvent(element, parsedEvents);
             }
         }
     }
