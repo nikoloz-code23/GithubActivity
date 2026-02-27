@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text.Json.Nodes;
 using GithubActivity.EventHandler;
 using GithubActivity.Interfaces;
-using GithubActivity.Structs;
+using GithubActivity.Data;
+using GithubActivity.Enums;
+using GithubActivity.ExtensionMethods;
 
 namespace GithubActivity.Handlers;
 
@@ -14,33 +16,30 @@ public class DataHandler
 
     public DataHandler()
     {
-        EventHandlers.Add("PushEvent", new PushEvent());
-        EventHandlers.Add("WatchEvent", new WatchEvent());
+        EventHandlers.Add(EventTypes.PushEvent.Name(), new PushEvent());
+        EventHandlers.Add(EventTypes.WatchEvent.Name(), new WatchEvent());
     }
 
     public void ParseData(JsonNode jsonData)
     {
-        PreviousEventData prevData = new();
         JsonArray jsonArray = jsonData.AsArray();
+        GithubEventData githubEventData = new();
 
         foreach(var element in jsonArray)
         {
             if (element == null) continue;
-            
-            JsonNode? eventType = element["type"];
-            if (eventType == null) continue;
+            githubEventData.CurrentEvent = element;
 
-            string eventTypeValue = eventType.ToString();
+            string? eventTypeValue = githubEventData.GetEventType();
+            if (eventTypeValue == null) continue;
 
             if (EventHandlers.TryGetValue(eventTypeValue, out IEventParser? eventParser))
             {
                 if (eventParser == null) continue;
-
-                eventParser.ParseEvent(element, prevData, parsedEvents);
-
-                prevData.previousEventType = eventTypeValue;
-                prevData.previousRepository = element["repo"]?["name"]?.ToString();
+                eventParser.ParseEvent(githubEventData, parsedEvents);
             }
+
+            githubEventData.SetPreviousData();
         }
     }
 
