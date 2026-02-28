@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,15 +16,11 @@ public static class DataUtility
             using Stream stream = await client.GetStreamAsync(dataUrl);
             jsonData = await JsonNode.ParseAsync(stream);
         }
-        catch (HttpRequestException e)
+        catch
         {
-            Console.WriteLine(e);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
+            return null;
         }
 
         return jsonData;
-    } 
+    }
 }
