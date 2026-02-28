@@ -1,4 +1,4 @@
-using GithubActivity.Enums;
+using GithubActivity.Types;
 
 namespace GithubActivity.ExtensionMethods;
 

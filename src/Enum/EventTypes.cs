@@ -1,21 +1,11 @@
-namespace GithubActivity.Enums;
+namespace GithubActivity.Types;
 
-public enum EventTypes
+public record EventTypes
 {
-    CommitCommentEvent,
-    CreateEvent,
-    DeleteEvent,
-    DiscussionEvent, 
-    ForkEvent,
-    GollumEvent, 
-    IssueCommentEvent, 
-    IssuesEvent, 
-    MemberEvent,
-    PublicEvent, 
-    PullRequestEvent,
-    PullRequestReviewEvent,
-    PullRequestReviewCommentEvent,
-    PushEvent,
-    ReleaseEvent,
-    WatchEvent,
+    public const string 
+        PushEvent = "pushevent",
+        IssuesEvent = "issuesevent",
+        WatchEvent = "watchevent",
+        ForkEvent = "forkevent",
+        CreateEvent = "createvent";
 }

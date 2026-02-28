@@ -1,28 +1,20 @@
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text.Json.Nodes;
 using GithubActivity.Utilities;
 using GithubActivity.Handlers;
-using GithubActivity.Data;
+using GithubActivity.Network;
 
 namespace GithubActivity.Application;
 
 public class App
 {
-    static readonly HttpClient client = new();
-    
-    public App()
-    {
-        // Setup all the necessary stuff for the HttpClient here.
-        client.DefaultRequestHeaders.Add("User-Agent", "User-Agent-Here");
-    }
-
     public async Task Run()
     {
         DataHandler handler = new();
 
-        JsonNode? jsonData = await DataUtility.GetData(client, GlobalData.GithubEventUrl());
+        JsonNode? jsonData = await DataUtility.GetData(NetworkClass.GithubEventUrl());
 
         if (jsonData == null)
         {
@@ -30,8 +22,10 @@ public class App
             return;
         }
 
-        await handler.ParseData(jsonData, client);
+        handler.ParseToGithubEventData(jsonData);
 
-        handler.PrintParsedData();
+        IEnumerable<string> results = await handler.ReturnParsedData();
+
+        handler.PrintParsedData(results);
     }
 }

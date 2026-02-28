@@ -1,3 +1,5 @@
+using System.Text.Json.Nodes; 
+
 using GithubActivity.Interfaces;
 using GithubActivity.Data;
 
@@ -5,9 +7,15 @@ namespace GithubActivity.EventHandler;
 
 public class PushEvent : IEventParser
 {
+    public JsonNode? response { get; set; }
     public string ParseEvent(GithubEventData githubEventData)
     {
-        int commitAmount = githubEventData.PayloadData.CommitSize;
+        int commitAmount = 0;
+
+        if (response?["commits"] is JsonArray responseArray)
+        {
+            commitAmount = responseArray.Count;
+        }
 
         if(commitAmount > 1)
         {
