@@ -1,18 +1,24 @@
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
+
 using GithubActivity.EventHandler;
 using GithubActivity.Interfaces;
 using GithubActivity.Data;
+using GithubActivity.Utilities;
 using GithubActivity.Enums;
 using GithubActivity.ExtensionMethods;
+using GithubActivity.Structs;
 
 namespace GithubActivity.Handlers;
 
 public class DataHandler
 {
-    public List<string> parsedEvents = new();
+    public List<GithubEventData> parsedData = new();
     private Dictionary<string, IEventParser> EventHandlers = new();
+    private List<Task<GithubEventData>> tasks = new();
 
     public DataHandler()
     {
@@ -20,34 +26,55 @@ public class DataHandler
         EventHandlers.Add(EventTypes.WatchEvent.Name(), new WatchEvent());
     }
 
-    public void ParseData(JsonNode jsonData)
+    public async Task ParseData(JsonNode jsonData, HttpClient client)
     {
         JsonArray jsonArray = jsonData.AsArray();
-        GithubEventData githubEventData = new();
+        Console.WriteLine("Parsing...");
 
-        foreach(var element in jsonArray)
+        foreach(JsonNode? element in jsonArray)
         {
-            if (element == null) continue;
-            githubEventData.CurrentEvent = element;
-
-            string? eventTypeValue = githubEventData.GetEventType();
-            if (eventTypeValue == null) continue;
-
-            if (EventHandlers.TryGetValue(eventTypeValue, out IEventParser? eventParser))
+            tasks.Add(Task.Run(async () =>
             {
-                if (eventParser == null) continue;
-                eventParser.ParseEvent(githubEventData, parsedEvents);
-            }
+                string? eventType = element!["type"]?.GetValue<string>();
+                if (string.IsNullOrEmpty(eventType))
+                    throw new Exception ("JSON Data is invalid. Aborting!");
+                
+                string? repoName = element["repo"]?["name"]?.GetValue<string>();
 
-            githubEventData.SetPreviousData();
+                Payload payload = new(
+                    element["payload"]?["head"]?.GetValue<string>(),
+                    element["payload"]?["before"]?.GetValue<string>()
+                );
+
+                string compareUrl = GlobalData.GithubCompareUrl(repoName, payload.Before, payload.Head);
+                JsonNode? response = await DataUtility.GetData(client, compareUrl);
+                
+                if (response?["commits"] is JsonArray responseArray)
+                {
+                    payload.CommitSize = responseArray.Count;
+                }
+
+                return new GithubEventData(
+                    eventType.ToLower().Trim(),
+                    repoName,
+                    payload
+                );
+            }));
         }
+
+        GithubEventData[] results = await Task.WhenAll(tasks);
+        parsedData.AddRange(results);
     }
 
     public void PrintParsedData()
     {
-        foreach(string data in parsedEvents)
+        foreach(GithubEventData data in parsedData)
         {
-            Console.WriteLine(data);
+            if (EventHandlers.TryGetValue(data.EventType, out IEventParser? eventParser))
+            {
+                if (eventParser == null) continue;
+                Console.WriteLine(eventParser.ParseEvent(data));
+            }
         }
     }
 }
