@@ -1,15 +1,16 @@
 ﻿using System.Threading.Tasks;
 using GithubActivity.Application;
+using GithubActivity.Data;
 
 namespace GithubActivity;
 
 class Program
 {
-    // TODO: Make sure that the args is used to specify the GitHub User.
     static async Task Main(string[] args)
     {
+        GlobalData.GithubUsername = args[0];
+
         App app = new();
-        
         await app.Run();
     }
 }
