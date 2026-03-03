@@ -4,6 +4,7 @@ It is a [GitHub User Activity Homework](https://roadmap.sh/projects/github-user-
 
 # How to use it?
 Make sure to have .NET 9 installed.
+
 Make sure to clone the repository:
 ```
 git clone git@github.com:nikoloz-code23/GithubActivity.git
