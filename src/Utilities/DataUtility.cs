@@ -26,7 +26,7 @@ public static class DataUtility
         catch (TaskCanceledException)
         {
             Console.WriteLine("Request has been cancelled. Closing...");
-            return default;
+            return default;  
         }
         catch (HttpRequestException)
         {
