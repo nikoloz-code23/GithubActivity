@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GithubActivity.Data;
+namespace GithubActivity.DataTypes;
 
 public record EventData
 {

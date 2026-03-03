@@ -1,6 +1,6 @@
 using System;
 using GithubActivity.Interfaces;
-using GithubActivity.Data;
+using GithubActivity.DataTypes;
 using GithubActivity.Utilities;
 
 namespace GithubActivity.EventHandler;

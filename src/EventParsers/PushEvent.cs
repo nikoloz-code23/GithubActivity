@@ -1,5 +1,5 @@
 using GithubActivity.Interfaces;
-using GithubActivity.Data;
+using GithubActivity.DataTypes;
 
 namespace GithubActivity.EventHandler;
 

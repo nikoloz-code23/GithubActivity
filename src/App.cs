@@ -3,9 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using GithubActivity.Data;
+using GithubActivity.DataTypes;
 using GithubActivity.Network;
 using GithubActivity.Handlers;
+using GithubActivity.Utilities;
 
 namespace GithubActivity.Application;
 
@@ -18,7 +19,7 @@ public class App
 
     public async Task Run()
     {
-        eventData = await NetworkClass.GetAndSerializeJsonData<EnumerableEventData>(NetworkClass.GithubEventUrl());
+        eventData = await DataUtility.GetAndSerializeJsonData<EnumerableEventData>(NetworkClass.GithubEventUrl());
 
         if (eventData == null)
             throw new Exception("Something went wrong. Aborting!");

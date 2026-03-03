@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using System.Net.Http.Json;
 
-using GithubActivity.Data;
+using GithubActivity.DataTypes;
 using GithubActivity.Types;
 using GithubActivity.Network;
-using GithubActivity.EventHandler;
+using GithubActivity.Utilities;
 using GithubActivity.Interfaces;
+using GithubActivity.EventHandler;
 
 namespace GithubActivity.Handlers;
 
@@ -20,7 +20,7 @@ public class DataHandler
                 string compareUrl = NetworkClass.GithubCompareUrl(data.Repo.Name, data.Payload.Before, data.Payload.Head);
                 PushEvent pushEvent = new()
                 {
-                    response = await NetworkClass.GetAndSerializeJsonData<CommitJsonData>(compareUrl)
+                    response = await DataUtility.GetAndSerializeJsonData<CommitJsonData>(compareUrl)
                 };
                 eventParser = pushEvent;
             break;

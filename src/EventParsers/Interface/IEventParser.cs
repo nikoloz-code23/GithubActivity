@@ -1,4 +1,4 @@
-using GithubActivity.Data;
+using GithubActivity.DataTypes;
 
 namespace GithubActivity.Interfaces;
 

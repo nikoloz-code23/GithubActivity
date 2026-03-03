@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace GithubActivity.Data;
+namespace GithubActivity.DataTypes;
 
 public struct CommitJsonData
 {
