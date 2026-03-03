@@ -1,31 +1,39 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Text.Json.Nodes;
-using GithubActivity.Utilities;
-using GithubActivity.Handlers;
+using System.Collections.Generic;
+
+using GithubActivity.Data;
 using GithubActivity.Network;
+using GithubActivity.Handlers;
 
 namespace GithubActivity.Application;
 
+using EnumerableEventData = IEnumerable<EventData>;
+
 public class App
 {
+    public EnumerableEventData? eventData;
+    private DataHandler handler = new();
+
     public async Task Run()
     {
-        DataHandler handler = new();
+        eventData = await NetworkClass.GetAndSerializeJsonData<EnumerableEventData>(NetworkClass.GithubEventUrl());
 
-        JsonNode? jsonData = await DataUtility.GetData(NetworkClass.GithubEventUrl());
+        if (eventData == null)
+            throw new Exception("Something went wrong. Aborting!");
 
-        if (jsonData == null)
+        IEnumerable<Task<string>> tasks = eventData.Select(async eventElement =>
         {
-            Console.WriteLine("The Github User doesn't exist or has no activity yet!");
-            return;
-        }
-
-        handler.ParseToGithubEventData(jsonData);
-
-        IEnumerable<string> results = await handler.ReturnParsedData();
-
-        handler.PrintParsedData(results);
+            string text = await handler.RunEventParsers(eventElement);
+            return text;
+        });
+        
+        string[] output = await Task.WhenAll(tasks);
+        Array.ForEach(await Task.WhenAll(tasks), (text) =>
+        {
+            if(text != string.Empty)
+                Console.WriteLine(text);
+        });
     }
 }

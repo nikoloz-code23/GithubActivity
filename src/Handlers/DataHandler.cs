@@ -1,67 +1,26 @@
-using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Text.Json.Nodes;
-using System.Linq;
+using System.Net.Http.Json;
 
 using GithubActivity.Data;
 using GithubActivity.Types;
 using GithubActivity.Network;
 using GithubActivity.EventHandler;
-using GithubActivity.Utilities;
 using GithubActivity.Interfaces;
 
 namespace GithubActivity.Handlers;
 
 public class DataHandler
 {
-    public List<GithubEventData> parsedData = new();
-
-    public void ParseToGithubEventData(JsonNode jsonData)
-    {
-        JsonArray jsonArray = jsonData.AsArray();
-        Console.WriteLine("Parsing...");
-
-        foreach(JsonNode? element in jsonArray)
-        {
-            string? eventType = element!["type"]?.GetValue<string>();
-            if (string.IsNullOrEmpty(eventType))
-                throw new Exception ("JSON Data is invalid. Aborting!");
-            
-            string? repoName = element["repo"]?["name"]?.GetValue<string>();
-            parsedData.Add(
-                new GithubEventData(
-                    eventType.ToLower().Trim(),
-                    repoName,
-                    element["payload"]!
-                )
-            );
-        }
-    }
-
-    public void PrintParsedData(IEnumerable<string> taskResults)
-    {
-        foreach(string data in taskResults)
-        {
-            if (string.IsNullOrEmpty(data) || data == string.Empty)
-                continue;
-            Console.WriteLine(data);
-        }      
-    }
-
-    public async Task<string> RunEventParsers(GithubEventData data)
+    public async Task<string> RunEventParsers(EventData data)
     {
         IEventParser eventParser;
-        switch (data.EventType)
+        switch (data.Type)
         {
             case EventTypes.PushEvent:
-                string beforeCommit = data.Payload["before"]!.GetValue<string>();
-                string headCommit = data.Payload["head"]!.GetValue<string>();
-
-                string compareUrl = NetworkClass.GithubCompareUrl(data.RepositoryName, beforeCommit, headCommit);
+                string compareUrl = NetworkClass.GithubCompareUrl(data.Repo.Name, data.Payload.Before, data.Payload.Head);
                 PushEvent pushEvent = new()
                 {
-                    response = await DataUtility.GetData(compareUrl)
+                    response = await NetworkClass.GetAndSerializeJsonData<CommitJsonData>(compareUrl)
                 };
                 eventParser = pushEvent;
             break;
@@ -83,18 +42,4 @@ public class DataHandler
         }
         return eventParser.ParseEvent(data);
     }
-
-    public async Task<IEnumerable<string>> ReturnParsedData()
-    {
-        List<Task<string>> tasks = [];
-        
-        foreach(GithubEventData data in parsedData)
-        {
-            tasks.Add(RunEventParsers(data));
-        }
-
-        IEnumerable<string> result = await Task.WhenAll(tasks);
-        return result.Where(element => element != string.Empty);
-    }
-
 }

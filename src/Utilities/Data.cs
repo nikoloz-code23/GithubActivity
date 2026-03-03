@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using System.Text.Json.Nodes;
+
 using GithubActivity.Network;
 
 namespace GithubActivity.Utilities;

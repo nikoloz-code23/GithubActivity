@@ -5,8 +5,8 @@ namespace GithubActivity.EventHandler;
 
 public class ForkEvent : IEventParser
 {
-    public string ParseEvent(GithubEventData githubEventData)
+    public string ParseEvent(EventData eventData)
     {
-        return $"- Forked {githubEventData.RepositoryName}";
+        return $"- Forked {eventData.Repo.Name}";
     }
 }

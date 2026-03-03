@@ -5,8 +5,8 @@ namespace GithubActivity.EventHandler;
 
 public class WatchEvent : IEventParser
 {
-    public string ParseEvent(GithubEventData githubEventData)
+    public string ParseEvent(EventData eventData)
     {
-        return $"- Is watching an event in {githubEventData.RepositoryName}";
+        return $"- Is watching an event in {eventData.Repo.Name}";
     }
 }

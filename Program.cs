@@ -10,7 +10,10 @@ class Program
     static async Task Main(string[] args)
     {
         if (args.Length < 1)
+        {
             Console.WriteLine("Please provide a Github Username!");
+            return;
+        }
 
         NetworkClass.GithubUsername = args[0];
 

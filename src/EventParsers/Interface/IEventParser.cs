@@ -4,5 +4,5 @@ namespace GithubActivity.Interfaces;
 
 public interface IEventParser
 {
-    public string ParseEvent(GithubEventData githubEventData);
+    public string ParseEvent(EventData eventData);
 }
