@@ -22,7 +22,10 @@ public class App
         eventData = await DataUtility.GetAndSerializeJsonData<EnumerableEventData>(NetworkClass.GithubEventUrl());
 
         if (eventData == null)
-            throw new Exception("Something went wrong. Aborting!");
+        {
+            Console.WriteLine("Couldn't get the data. Aborting!");    
+            return;
+        }
 
         IEnumerable<Task<string>> tasks = eventData.Select(async eventElement =>
         {

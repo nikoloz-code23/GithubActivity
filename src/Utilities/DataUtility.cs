@@ -26,16 +26,19 @@ public static class DataUtility
         catch (TaskCanceledException)
         {
             Console.WriteLine("Request has been cancelled. Closing...");
+            Environment.Exit(1);
             return default;  
         }
         catch (HttpRequestException)
         {
             Console.WriteLine("Cannot connect to the server, please check your internet connection. Aborting!");
+            Environment.Exit(1);
             return default;
         }
         catch(Exception e)
         {
             Console.WriteLine($"Error: {e.Message}.\nClosing...");
+            Environment.Exit(1);
             return default;
         }
     }
