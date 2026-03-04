@@ -14,14 +14,18 @@ public static class DataUtility
     {
         try
         {    
-            HttpResponseMessage response = await NetworkClass.client.GetAsync(uri);
+            using HttpResponseMessage response = await NetworkClass.client.GetAsync(uri);
             if (!response.IsSuccessStatusCode)
             {
-                var statusCode = response.StatusCode.ToString();
+                string statusCode = response.StatusCode.ToString();
                 throw new Exception($"Couldn't get information from GitHub. Status code: {statusCode}");
             }
-            using Stream stringData = response.Content.ReadAsStream();
-            return await JsonSerializer.DeserializeAsync<T>(stringData);
+            string? responseString = await response.Content.ReadAsStringAsync();
+
+            if (responseString == null)
+                throw new Exception($"Couldn't get response content.");
+            
+            return JsonSerializer.Deserialize<T>(responseString);
         }
         catch (TaskCanceledException)
         {
