@@ -19,7 +19,7 @@ public class App
 
     public async Task Run()
     {
-        eventData = await DataUtility.GetAndSerializeJsonData<EnumerableEventData>(NetworkClass.GithubEventUrl());
+        eventData = await DataUtility.GetAndSerializeJsonData<EnumerableEventData>(GlobalData.GithubEventUrl());
 
         if (eventData == null)
         {
@@ -29,7 +29,16 @@ public class App
 
         IEnumerable<Task<string>> tasks = eventData.Select(async eventElement =>
         {
-            string text = await handler.RunEventParsers(eventElement);
+            string text = string.Empty;
+
+            if (GlobalData.Filter == string.Empty)
+                text = await handler.RunEventParsers(eventElement);
+            else
+            {
+                if (GlobalData.Filter == eventElement.Type)
+                    text = await handler.RunEventParsers(eventElement);
+            }
+
             return text;
         });
         

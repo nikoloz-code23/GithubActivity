@@ -17,7 +17,7 @@ public class DataHandler
         switch (data.Type)
         {
             case EventTypes.PushEvent:
-                string compareUrl = NetworkClass.GithubCompareUrl(data.Repo.Name, data.Payload.Before, data.Payload.Head);
+                string compareUrl = GlobalData.GithubCompareUrl(data.Repo.Name, data.Payload.Before, data.Payload.Head);
                 PushEvent pushEvent = new()
                 {
                     response = await DataUtility.GetAndSerializeJsonData<CommitJsonData>(compareUrl)
