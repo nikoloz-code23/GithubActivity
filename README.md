@@ -10,8 +10,9 @@ Make sure to clone the repository:
 git clone git@github.com:nikoloz-code23/GithubActivity.git
 ```
 After that, inside the project directory, run:
+```
+dotnet run --help
+```
+to get all the information needed on how to use the program.
 
-```
-dotnet run github-username
-```
 And that's about it.
